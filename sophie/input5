@@ -1,0 +1,20 @@
+8
+front_door 0.2
+in_cabinet 0.3
+under_bed 0.4
+behind_blinds 0.1
+front_door_1 0.0
+in_cabinet_1 0.0
+under_bed_1 0.0
+behind_blinds_1 0.0
+10
+front_door under_bed 5
+under_bed behind_blinds 9
+front_door behind_blinds 5
+front_door in_cabinet 2
+in_cabinet behind_blinds 6
+front_door_1 under_bed_1 5
+under_bed_1 behind_blinds_1 9
+front_door_1 behind_blinds_1 5
+front_door_1 in_cabinet_1 2
+in_cabinet_1 behind_blinds_1 6

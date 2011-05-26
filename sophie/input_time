@@ -1,0 +1,23 @@
+Parse: 0.000128984451294
+Floyd-Warshall: 6.69956207275e-05
+Double check: 1.8835067749e-05
+Best path: 4.72068786621e-05
+6.00
+Parse: 0.000132083892822
+Floyd-Warshall: 6.8187713623e-05
+Double check: 2.00271606445e-05
+Best path: 4.50611114502e-05
+6.00
+Parse: 0.000128984451294
+Floyd-Warshall: 9.70363616943e-05
+Double check: 2.121925354e-05
+Best path: 4.57763671875e-05
+6.00
+Parse: 0.000136137008667
+Floyd-Warshall: 6.79492950439e-05
+Double check: 1.97887420654e-05
+Best path: 4.31537628174e-05
+6.00
+
+----------------------------------
+
