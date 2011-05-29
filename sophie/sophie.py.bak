@@ -62,20 +62,23 @@ def double_check():
     return
 
 Counter = 0
-def find_best_path(cur_loc, cur_dist, cur_prob, exp_val):
+def find_best_path(cur_loc, cur_dist, exp_val):
     global Best
     global Counter
     V[cur_loc] = True
     exp_val += P[cur_loc]*cur_dist
-    cur_prob -= P[cur_loc]
 
     at_end = True
     for a in Nodes:
 	if V[a] == False:
 	    at_end = False
-	    #if (exp_val+P[a]*(cur_dist+G[(cur_loc, a)])) < Best:
-	    if (exp_val+cur_prob*(cur_dist+G[(cur_loc, a)])) < Best:
-		find_best_path(a, cur_dist+G[(cur_loc, a)], cur_prob, exp_val)
+	    if (exp_val+P[a]*(cur_dist+G[(cur_loc, a)])) < Best:
+		'''
+		Counter += 1
+		print a, '%d ' % Counter, exp_val, cur_dist, Best
+		'''
+
+		find_best_path(a, cur_dist+G[(cur_loc, a)], exp_val)
 
     if at_end:
 	if exp_val < Best:
@@ -119,7 +122,7 @@ def main():
     initialize_first_best()
 
     #Time = time.time()
-    find_best_path(Start, 0, 1, 0)
+    find_best_path(Start, 0, 0)
     #print "Best path:", time.time()-Time
 
     print "%.2f" % Best
