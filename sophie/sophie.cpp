@@ -62,7 +62,6 @@ void parse_file(char *s) {
 
     // Reads first line to find out how many locations Sophie could be hiding at
     in >> num_places;
-    //num_places = strtod(s);
 
     // Allocate space for Nodes array and adjacency matrix
     nodes = new Node*[num_places];
@@ -101,6 +100,49 @@ void parse_file(char *s) {
     return;
 }
 
+// Floyd-Warshall algorithm to find the all-pairs shortest path
+void floyd_warshall() {
+    for (int k = 0; k < num_places; k++) {
+	for (int i = 0; i < num_places; i++) {
+	    for (int j = 0; j < num_places; j++) {
+		if (dists[i][k] + dists[k][j] < dists[i][j]) {
+		    dists[i][j] = dists[i][k] + dists[k][j];
+		}
+	    }
+	}
+    }
+}
+
+void find_best_path(int cur_loc, double cur_dist, double cur_prob, double exp_val) {
+    // Marks the current node as visited so we iterate through every combination
+    nodes[cur_loc]->visited = true;
+    exp_val += nodes[cur_loc]->prob * cur_dist;
+    cur_prob -= nodes[cur_loc]->prob;
+
+    bool at_end = true;
+    for (int i = 0; i < num_places; i++) {
+	if (nodes[i]->visited == false) {
+	    at_end = false;
+	    // Most important line in the entire program:
+	    // Backtracks if the remaining_distance*probability_of_sophie_being_there
+	    // is greater than the current best time.
+	    if (exp_val+cur_prob*(cur_dist+dists[cur_loc][i]) < Best) {
+		find_best_path(i, cur_dist+dists[cur_loc][i], cur_prob, exp_val);
+	    }
+	}
+    }
+
+    if (at_end) {
+	if (exp_val < Best) {
+	    Best = exp_val;
+	}
+    }
+
+    // Resets the node so the next iteration will include the node in the calculation
+    nodes[cur_loc]->visited = false;
+    return;
+}
+
 void print_everything() {
     cout << "Best: " << Best << endl;
     cout << "num_places: " << num_places << endl;
@@ -120,16 +162,13 @@ void print_everything() {
     }
 }
 
-
-
-
 int main(int argc, char* argv[]) {
     parse_file(argv[1]);
-    //floyd_warshall();
-    //find_best_path(0, 1, 0);
-    //printf("%.2f\n", Best);
+    floyd_warshall();
+    find_best_path(0, 0, 1, 0);
+    printf("%.2f\n", Best);
 
-    print_everything();
+    //print_everything();
 
     return 0;
 }
