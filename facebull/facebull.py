@@ -5,6 +5,7 @@ C = {} # compound list
 A = [] # adjacency matrix
 M = {} # machine:cost list
 V = {} # visited
+S = set([]) # set of combinations already visited
 max_comp = 0
 Best = 0
 
@@ -39,7 +40,6 @@ def check_array():
 	flag = False
 
     return True
-
 
 def dec_array(machine):
     flag = True
@@ -87,6 +87,13 @@ def populate_array():
 	A[comp1-1][comp2-1] -= 1
     return
 
+def visited_true():
+    l = []
+    for m in M:
+        if V[m] == True:
+            l.append(m)
+    return tuple((sorted(l)))
+
 def file_parse(argv):
     f = open(argv, 'r')
     line = (f.readline()).split()
@@ -111,19 +118,32 @@ def file_parse(argv):
 	    A[i].append(0)
     return
 
-def solve():
-    max_val = Best
+Counter = 0
+def solve(machine, cur_value):
+    global Best
+    global Counter
+    Counter += 1
+    V[machine] = False
+    vt = visited_true()
+    if vt not in S:
+        S.add(vt)
+        if dec_array(M[machine]) == True:
+            cur_value -= M[machine][0]
+            if cur_value < Best:
+                Best = cur_value
+                print V, Best
     for m in M:
-	for v in V:
-	    V[v] = True
-	solve_helper(m, max_val)
-	print
-    print Best
+        #print V
+        if V[m] == True:
+            solve(m, cur_value)
+    V[machine] = True
+    #print Best
     return
 
 #not correct, outputting only 6*6, not 6! like i want
 def solve_helper(machine, cur_value):
     global Best
+    global Counter
     V[machine] = False
     #if dec_array(M[machine]) == False:
     print V
@@ -145,7 +165,43 @@ def main():
     populate_array()
     print_array()
     #print check_array()
-    solve()
+    solve(1, Best)
+    print Counter
+    '''
+    V[1] = False
+    dec_array(M[1])
+    print_array()
+    print check_array()
+
+    V[3] = False
+    dec_array(M[3])
+    print_array()
+    print check_array()
+
+    V[3] = True
+    dec_array(M[1])
+    print_array()
+    print check_array()
+
+    V[2] = False
+    dec_array(M[1])
+    print_array()
+    print check_array()
+    
+    V[5] = False
+    dec_array(M[1])
+    print_array()
+    print check_array()
+
+    dec_array(M[1])
+    print_array()
+    print check_array()
+
+    dec_array(M[1])
+    print_array()
+    print check_array()
+    '''
+
     return
 
 if __name__ == "__main__":
