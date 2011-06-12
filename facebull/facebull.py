@@ -8,6 +8,13 @@ V = {} # visited
 S = set([]) # set of combinations already visited
 max_comp = 0
 Best = 0
+Best_combo = ()
+
+def print_list(l):
+    for i in l:
+	print i,
+    print
+    return
 
 def print_array():
     print
@@ -97,6 +104,8 @@ def visited_true():
 def file_parse(argv):
     f = open(argv, 'r')
     line = (f.readline()).split()
+    l = []
+    global Best_combo
     while line:
 	machine = int(line[0][1:])
 	comp1 = int(line[1][1:])
@@ -109,66 +118,81 @@ def file_parse(argv):
 	Best += cost
 	M[machine] = (cost, comp1, comp2)
 	V[machine] = True
+	l.append(machine)
 	C[(comp1, comp2)] = machine
 	line = (f.readline()).split()
 
+    Best_combo = sorted(l)
     for i in xrange(max_comp):
 	A.append([])
 	for j in xrange(max_comp):
 	    A[i].append(0)
     return
 
+def solve(val):
+    for m in M:
+	solve_helper(m, val)
+    return
+
 Counter = 0
-def solve(machine, cur_value):
+def solve_helper(machine, cur_value):
     global Best
     global Counter
+    global Best_combo
     Counter += 1
+    #print '\t', machine, visited_true()
     V[machine] = False
     vt = visited_true()
     if vt not in S:
         S.add(vt)
         if dec_array(M[machine]) == True:
             cur_value -= M[machine][0]
+	    #print '---', V
             if cur_value < Best:
+		#print vt
+		#print_array()
                 Best = cur_value
-                print V, Best
-    for m in M:
-        #print V
-        if V[m] == True:
-            solve(m, cur_value)
+		Best_combo = list(vt)
+	    for m in M:
+		#print V
+		if V[m] == True:
+		    solve_helper(m, cur_value)
     V[machine] = True
+    inc_array(M[machine])
     #print Best
-    return
-
-#not correct, outputting only 6*6, not 6! like i want
-def solve_helper(machine, cur_value):
-    global Best
-    global Counter
-    V[machine] = False
-    #if dec_array(M[machine]) == False:
-    print V
-    if True == False:
-	return
-    else:
-	cur_value -= M[machine][0] #cost
-	if cur_value < Best:
-	    Best = cur_value
-	for m in M:
-	    if V[m] == True:
-		solve_helper(m, cur_value)
-
-    V[m] == True
     return
 
 def main():
     file_parse(sys.argv[1])
     populate_array()
-    print_array()
-    #print check_array()
-    solve(1, Best)
-    print Counter
+    #print_array()
+    solve(Best)
+    print Best
+    print_list(Best_combo)
+
+
     '''
+    print_array()
     V[1] = False
+    dec_array(M[1])
+    print_array()
+    V[2] = True
+    V[3] = True
+    V[4] = False
+    dec_array(M[4])
+    V[5] = True
+    V[6] = True
+
+    print_array()
+    print V
+    V[5] = False
+    print dec_array(M[5])
+    print_array()
+    print V
+    print check_array()
+    '''
+
+    '''
     dec_array(M[1])
     print_array()
     print check_array()
