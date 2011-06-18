@@ -63,8 +63,6 @@ def make_empty_arr():
 	    A[i].append(float('inf'))
     return A
 
-def algorithm():
-    return floyd_warshall()
 
 def floyd_warshall():
     ea = make_empty_arr()
@@ -95,14 +93,17 @@ def solve(val):
 	solve_helper(m, val)
     return
 
+Counter = 0
 def solve_helper(machine, cur_value):
     global Best
+    global Counter
     global Best_combo
+    Counter += 1
     V[machine] = False
     vt = visited_true()
     if vt not in S:
         S.add(vt)
-	if algorithm() == True:
+	if floyd_warshall() == True:
             cur_value -= M[machine][0]
             if cur_value < Best:
                 Best = cur_value
@@ -115,7 +116,6 @@ def solve_helper(machine, cur_value):
 
 def main():
     file_parse(sys.argv[1])
-    #solve_helper(1, Best)
     solve(Best)
     print Best
     print_list(Best_combo)
