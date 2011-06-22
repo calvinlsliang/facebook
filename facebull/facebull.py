@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 
+# Look at SCC algorithms. Namely Kosaraju, Tarjan, and Gabow. http://en.wikipedia.org/wiki/Strongly_connected_component
 C = {} # compound list
 M = {} # machine:cost list
 V = {} # visited
