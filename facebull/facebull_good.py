@@ -98,10 +98,10 @@ def solve_helper(machine, cur_value):
     global Best
     global Counter
     global Best_combo
-    Counter += 1
     V[machine] = False
     vt = visited_true()
     if vt not in S:
+	Counter += 1
         S.add(vt)
 	if floyd_warshall() == True:
             cur_value -= M[machine][0]
@@ -117,7 +117,7 @@ def solve_helper(machine, cur_value):
 def main():
     file_parse(sys.argv[1])
     solve(Best)
-    print Best
+    print Best, Counter
     print_list(Best_combo)
 
     return

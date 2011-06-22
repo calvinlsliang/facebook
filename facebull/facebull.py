@@ -5,10 +5,18 @@ C = {} # compound list
 M = {} # machine:cost list
 V = {} # visited
 S = set([]) # set of combinations already visited
+Stack = []
+SCC = []
 Compound_set = set([])
 max_comp = 0
 Best = 0
 Best_combo = ()
+
+class Node:
+    def __init__(self, m):
+	self.machine = m
+	self.index = -1
+	self.lowlink = -1
 
 def print_list(l):
     for i in l:
@@ -41,8 +49,8 @@ def file_parse(argv):
 	cost = int(line[3])
 	global max_comp
 	max_comp = max(comp1, comp2)
-	Compound_set.add(comp1)
-	Compound_set.add(comp2)
+	Compound_set.add(Node(comp1))
+	Compound_set.add(Node(comp2))
 
 	global Best
 	Best += cost
@@ -63,8 +71,9 @@ def make_empty_arr():
 	    A[i].append(float('inf'))
     return A
 
-def algorithm():
-    return floyd_warshall()
+def algorithm(machine):
+    return tarjan(machine)
+    #return floyd_warshall()
 
 def floyd_warshall():
     ea = make_empty_arr()
@@ -76,33 +85,65 @@ def floyd_warshall():
 	    cost = M[m][0]
 	    ea[comp1-1][comp2-1] = cost
 
-    for k in Compound_set:
-	for i in Compound_set:
-	    for j in Compound_set:
+    for knode in Compound_set:
+	for inode in Compound_set:
+	    for jnode in Compound_set:
+		k = knode.machine
+		i = inode.machine
+		j = jnode.machine
 		if i != j:
 		    if ea[i-1][k-1] + ea[k-1][j-1] < ea[i-1][j-1]:
 			ea[i-1][j-1] = ea[i-1][k-1] + ea[k-1][j-1]
 
-    for i in Compound_set:
-	for j in Compound_set:
+    for inode in Compound_set:
+	for jnode in Compound_set:
+	    i = inode.machine
+	    j = jnode.machine
 	    if i != j:
 		if ea[i-1][j-1] == float('inf'):
 		    return False
     return True
+
+def tarjan(node):
+    index = 0
+    ea = make_empty_arr()
+
+    for m in M:
+	if V[m] == True:
+	    comp1 = M[m][1]
+	    comp2 = M[m][2]
+	    cost = M[m][0]
+	    ea[comp1-1][comp2-1] = cost
+
+    tarjan_helper(node, ea, index)
+
+
+    # clean node values, reset them all to -1
+    return len(SCC)
+
+def tarjan_helper(node, adj_list, index):
+    pass
+
+
+
+
 
 def solve(val):
     for m in M:
 	solve_helper(m, val)
     return
 
+Counter = 0
 def solve_helper(machine, cur_value):
     global Best
     global Best_combo
+    global Counter
     V[machine] = False
     vt = visited_true()
     if vt not in S:
+	Counter += 1
         S.add(vt)
-	if algorithm() == True:
+	if algorithm(next(iter(vt))) == True:
             cur_value -= M[machine][0]
             if cur_value < Best:
                 Best = cur_value
@@ -117,7 +158,7 @@ def main():
     file_parse(sys.argv[1])
     #solve_helper(1, Best)
     solve(Best)
-    print Best
+    print Best, Counter
     print_list(Best_combo)
 
     return
