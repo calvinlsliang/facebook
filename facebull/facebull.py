@@ -14,8 +14,10 @@ Best = 0
 Best_combo = ()
 
 class Node:
-    def __init__(self, m):
+    def __init__(self, m, c1, c2):
 	self.machine = m
+        self.comp1 = c1
+        self.comp2 = c2
 	self.index = -1
 	self.lowlink = -1
 
@@ -50,8 +52,7 @@ def file_parse(argv):
 	cost = int(line[3])
 	global max_comp
 	max_comp = max(comp1, comp2)
-	Compound_set.add(Node(comp1))
-	Compound_set.add(Node(comp2))
+	Compound_set.add(Node(machine, comp1, comp2))
 
 	global Best
 	Best += cost
@@ -72,8 +73,8 @@ def make_empty_arr():
 	    A[i].append(float('inf'))
     return A
 
-def algorithm(machine):
-    return tarjan(machine)
+def algorithm():
+    return tarjan()
     #return floyd_warshall()
 
 def floyd_warshall():
@@ -86,48 +87,89 @@ def floyd_warshall():
 	    cost = M[m][0]
 	    ea[comp1-1][comp2-1] = cost
 
-    for knode in Compound_set:
-	for inode in Compound_set:
-	    for jnode in Compound_set:
-		k = knode.machine
-		i = inode.machine
-		j = jnode.machine
+    for k in xrange(max_comp):
+        for i in xrange(max_comp):
+            for j in xrange(max_comp):
 		if i != j:
-		    if ea[i-1][k-1] + ea[k-1][j-1] < ea[i-1][j-1]:
-			ea[i-1][j-1] = ea[i-1][k-1] + ea[k-1][j-1]
+		    if ea[i][k] + ea[k][j] < ea[i][j]:
+                        ea[i][j] = ea[i][k] + ea[k][j]
 
-    for inode in Compound_set:
-	for jnode in Compound_set:
-	    i = inode.machine
-	    j = jnode.machine
+    for i in xrange(max_comp):
+        for j in xrange(max_comp):
 	    if i != j:
-		if ea[i-1][j-1] == float('inf'):
+		if ea[i][j] == float('inf'):
 		    return False
     return True
 
-def tarjan(node):
+def tarjan():
     index = 0
+    global Sets
     ea = make_empty_arr()
+
+    node = None
 
     for m in M:
 	if V[m] == True:
 	    comp1 = M[m][1]
 	    comp2 = M[m][2]
 	    cost = M[m][0]
-	    ea[comp1-1][comp2-1] = cost
+            node = Node(m, comp1, comp2)
+	    ea[comp1-1][comp2-1] = node
+
+    if node == None:
+        return False
 
     tarjan_helper(node, ea, index)
 
 
-    # clean node values, reset them all to -1
-    return len(SCC)
+    global SCC
+    if len(SCC) == 1:
+        if len(SCC[0]) == 1:
+            SCC = []
+            Sets = set([])
+            return False
+        elif len(Sets) == max_comp:
+            SCC = []
+            Sets = set([])
+            return True
+        else:
+            SCC = []
+            Sets = set([])
+            return False
+    else:
+        SCC = []
+        Sets = set([])
+        return False
 
+Sets = set([])
 def tarjan_helper(node, adj_list, index):
-    pass
+    global SCC
+    global Stack
+    node.index = index
+    node.lowlink = index
+    index += 1
+    Stack.append(node)
+    Sets.add(node.machine)
+    for i in xrange(max_comp):
+        if adj_list[node.comp1-1][i] != float('inf'):
+            n = adj_list[node.comp1-1][i]
+            if n.index == -1:
+                tarjan_helper(n, adj_list, index)
+                node.lowlink = min(node.lowlink, n.lowlink)
+            else:
+                for i in xrange(len(Stack)):
+                    if Stack[i] == n:
+                        node.lowlink = min(node.lowlink, n.index)
 
-
-
-
+    if node.lowlink == node.index:
+        comp = []
+        n = Stack.pop()
+        comp.append(n)
+        while (n != node):
+            n = Stack.pop()
+            comp.append(n)
+        SCC.append(comp)
+    return
 
 def solve(val):
     for m in M:
@@ -144,7 +186,7 @@ def solve_helper(machine, cur_value):
     if vt not in S:
 	Counter += 1
         S.add(vt)
-	if algorithm(next(iter(vt))) == True:
+	if algorithm() == True:
             cur_value -= M[machine][0]
             if cur_value < Best:
                 Best = cur_value
